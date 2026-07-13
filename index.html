@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <link rel="apple-touch-icon" sizes="180x180" href="icn1.png">
+    <link rel="manifest" href="manifest.json">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>1D Body Ledger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Padauk:wght=400;700&display=swap');
+
+        :root {
+            --dark-bg: #121212;
+            --dark-card: #1e1e1e;
+            --dark-border: #2d2d2d;
+            
+            --login-primary: #4f46e5;
+            --login-bg: #f8fafc;
+            --login-surface: #ffffff;
+            --login-text: #1e293b;
+            --login-muted: #64748b;
+            --login-border: #e2e8f0;
+            --login-error: #ef4444;
+            --login-success: #10b981;
+        }
+
+        body { 
+            font-family: 'Padauk', sans-serif; 
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .table-container::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dark .table-container::-webkit-scrollbar-thumb {
+            background-color: #4b5563;
+        }
+
+        .login-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--login-bg);
+            color: var(--login-text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+        }
+
+        .login-overlay * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .login-container {
+            background: var(--login-surface);
+            padding: 30px 24px;
+            border-radius: 16px;
+            border: 1px solid var(--login-border);
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .login-container h2 {
+            font-size: 20px;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: var(--login-text);
+        }
+
+        .login-subtitle {
+            font-size: 13px;
+            color: var(--login-muted);
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .login-input-group {
+            margin-bottom: 16px;
+        }
+
+        .login-container label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--login-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .login-container input[type="text"], .login-container input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            background: var(--login-bg);
+            border: 1px solid var(--login-border);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+            color: var(--login-text);
+        }
+
+        .login-container input:focus {
+            outline: none;
+            border-color: var(--login-primary);
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+        }
+
+        .login-remember-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: var(--login-muted);
+            cursor: pointer;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: var(--login-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .login-btn:hover {
+            opacity: 0.9;
+        }
+
+        .login-error-card {
+            display: none;
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #991b1b;
+        }
+
+        .login-error-card b {
+            background: #fee2e2;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--login-error);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-900 dark:bg-darkBg dark:text-gray-100 transition-colors duration-200 text-xs">
+
+    <div id="loginOverlay" class="login-overlay">
+        <div class="login-container">
+            <div class="login-header">
+                <h2>DEVICE ACTIVATION</h2>
+                <div class="login-subtitle">Contact Us: 09785278703</div>
+            </div>
+            
+            <div class="login-input-group">
+                <label for="usernameInput">Username</label>
+                <input type="text" id="usernameInput" placeholder="Enter username" autocomplete="off">
+            </div>
+
+            <div class="login-input-group">
+                <label for="passwordInput">Password</label>
+                <input type="password" id="passwordInput" placeholder="Enter password">
+            </div>
+
+            <label class="login-remember-container">
+                <input type="checkbox" id="rememberMe"> Remember me
+            </label>
+            
+            <button class="login-btn" onclick="handleLogin()">LOGIN</button>
+            
+            <div id="errorCard" class="login-error-card"></div>
+        </div>
+    </div>
+
+    <div class="max-w-6xl mx-auto p-3">
+        
+        <header class="flex justify-between items-center mb-3 bg-white dark:bg-darkCard p-3 rounded-xl shadow-sm border border-gray-100 dark:border-darkBorder">
+            <div>
+                <h1 class="text-xl font-bold text-blue-600 dark:text-blue-4xl flex items-center gap-2">
+                    <i class="fas fa-futbol"></i> Football Ledger <span class="text-2xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-normal">Tablet VERSION</span>
+                </h1>
+            </div>
+            <div class="flex gap-2">
+                <button id="clearDataBtn" class="px-3 py-1.5 bg-red-100 hover:bg-red-200 text-white-700 dark:bg-red-950/40 dark:hover:bg-red-600/60 dark:text-red-300 rounded-lg text-xs font-bold transition-all">
+                    <i class="fas fa-rotate mr-1"></i>Restart Data
+                </button>
+                <button id="themeToggle" onclick="playTabSound()" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 rounded-lg text-xs font-bold transition-all">
+                    <i class="fas fa-circle-half-stroke mr-1"></i>Light / Dark
+                </button>
+            </div>
+        </header>
+
+        <nav class="grid grid-cols-6 gap-1 mb-3 bg-gray-200 dark:bg-gray-800 p-1 rounded-xl text-center">
+            <button onclick="switchTab('match-tab'); playTabSound();" class="tab-btn py-2 text-xs font-bold rounded-lg bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-white" id="default-tab"><i class="fas fa-gamepad mr-1"></i>Match</button>
+            <button onclick="switchTab('entry-tab'); playTabSound();" class="tab-btn py-2 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-4xl hover:bg-white/50"><i class="fas fa-pen-to-square mr-1"></i>Entry</button>
+            <button onclick="switchTab('name-tab'); playTabSound();" class="tab-btn py-2 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-4xl hover:bg-white/50"><i class="fas fa-users mr-1"></i>Name List</button>
+            <button onclick="switchTab('ledger-tab'); playTabSound();" class="tab-btn py-2 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-4xl hover:bg-white/50"><i class="fas fa-book mr-1"></i>Ledger</button>
+            <button onclick="switchTab('winlose-tab'); playTabSound();" class="tab-btn py-2 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-4xl hover:bg-white/50"><i class="fas fa-chart-line mr-1"></i>Win/Lose</button>
+            <button onclick="switchTab('slipcopy-tab'); playTabSound();" class="tab-btn py-2 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-4xl hover:bg-white/50"><i class="fas fa-copy mr-1"></i>Slip Copy</button>
+        </nav>
+
+        <section id="match-tab" class="tab-content block space-y-3">
+            <div class="grid grid-cols-2 gap-3 bg-white dark:bg-darkCard p-3 rounded-xl shadow-sm border border-gray-100 dark:border-darkBorder">
+                <div class="space-y-2 border-r pr-3 border-gray-100 dark:border-darkBorder">
+                    <h3 class="text-sm font-bold text-blue-600 border-b pb-1"><i class="fas fa-plus-circle mr-1.5"></i>Add New Match</h3>
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Upper Team</label>
+                        <input type="text" id="home-team" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700" placeholder="UPPER TEAM">
+                    </div>
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Under Team</label>
+                        <input type="text" id="away-team" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700" placeholder="UNDER TEAM">
+                    </div>
+                    <div class="pt-1">
+                        <button onclick="saveMatch(); playClickSound();" class="w-full bg-blue-600 text-white py-2 rounded-lg text-xs font-bold"><i class="fas fa-floppy-disk mr-1"></i>Save Match</button>
+                    </div>
+                </div>
+                
+                <div class="space-y-2">
+                    <h3 class="text-sm font-bold text-amber-500 border-b pb-1"><i class="fas fa-calculator mr-1.5"></i>Add Odds & Results</h3>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-2xs mb-0.5 font-medium text-gray-500">Body Odds</label>
+                            <input type="text" id="body-odds" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono font-bold text-emerald-600" placeholder="1-80">
+                        </div>
+                        <div>
+                            <label class="block text-2xs mb-0.5 font-medium text-gray-500">Goal Odds</label>
+                            <input type="text" id="goal-odds" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono font-bold text-orange-600" placeholder="3+20">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-2xs mb-0.5 font-medium text-gray-500">Upper Score</label>
+                            <input type="number" id="home-score" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono" value="">
+                        </div>
+                        <div>
+                            <label class="block text-2xs mb-0.5 font-medium text-gray-500">Under Score</label>
+                            <input type="number" id="away-score" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono" value="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-darkCard rounded-xl shadow-sm border border-gray-100 dark:border-darkBorder overflow-hidden">
+                <div class="table-container overflow-x-auto w-full">
+                    <table class="w-full text-left border-collapse min-w-[650px] text-xs">
+                        <thead>
+                            <tr class="bg-gray-100 dark:bg-gray-800 border-b dark:border-darkBorder font-bold text-gray-700 dark:text-gray-300">
+                                <th class="p-2 w-12 text-center">No</th>
+                                <th class="p-2">Upper Vs Under Team</th>
+                                <th class="p-2 w-24">Body Odds</th>
+                                <th class="p-2 w-24">Goal Odds</th>
+                                <th class="p-2 w-24 text-center">Score</th>
+                                <th class="p-2 w-32 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="match-list-table" class="divide-y dark:divide-darkBorder"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <div id="editMatchModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden backdrop-blur-2xs">
+            <div class="bg-white dark:bg-darkCard p-4 rounded-xl shadow-xl border border-gray-200 dark:border-darkBorder max-w-md w-full mx-4 space-y-3">
+                <div class="flex justify-between items-center border-b pb-1.5">
+                    <h3 class="text-sm font-bold text-amber-500"><i class="fas fa-pen-to-square mr-1.5"></i>Edit Match Details</h3>
+                    <button onclick="closeMatchModal(); playTabSound();" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg">&times;</button>
+                </div>
+                <input type="hidden" id="modal-match-id">
+                
+                <div>
+                    <label class="block text-2xs mb-0.5 font-medium text-gray-500">Upper Team</label>
+                    <input type="text" id="modal-home-team" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700">
+                </div>
+                <div>
+                    <label class="block text-2xs mb-0.5 font-medium text-gray-500">Under Team</label>
+                    <input type="text" id="modal-away-team" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Body Odds</label>
+                        <input type="text" id="modal-body-odds" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono font-bold text-emerald-600">
+                    </div>
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Goal Odds</label>
+                        <input type="text" id="modal-goal-odds" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono font-bold text-orange-600">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Upper Score</label>
+                        <input type="number" id="modal-home-score" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Under Score</label>
+                        <input type="number" id="modal-away-score" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <button onclick="saveModalMatch(); playClickSound();" class="col-span-2 bg-blue-600 text-white py-2 rounded-lg text-xs font-bold"><i class="fas fa-check mr-1"></i>Save Changes</button>
+                    <button onclick="deleteModalMatch(); playTabSound();" class="bg-red-600 text-white py-2 rounded-lg text-xs font-bold"><i class="fas fa-trash-can mr-1"></i>Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <section id="entry-tab" class="tab-content hidden space-y-3">
+            <div class="bg-white dark:bg-darkCard p-4 rounded-xl shadow-sm border border-gray-100 dark:border-darkBorder max-w-md mx-auto space-y-3">
+                <h3 class="text-sm font-bold text-green-600 border-b pb-1"><i class="fas fa-file-invoice mr-1.5"></i>Add Slip Entry</h3>
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Select Match</label>
+                        <select id="entry-match-select" onchange="updateEntryOddsDropdown(); playTabSound();" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700"></select>
+                    </div>
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Select Player</label>
+                        <select id="entry-player-select" onchange="renderLiveEntryTable(); playTabSound();" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700"></select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Bet Type</label>
+                        <select id="entry-type-select" onchange="autoFillOdds(); playTabSound();" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700"></select>
+                    </div>
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Odds</label>
+                        <input type="text" id="entry-odds" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono font-bold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-2xs mb-0.5 font-medium text-gray-500">Bet Amount</label>
+                    <input type="number" id="entry-amount" class="w-full p-2 text-sm border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono font-bold text-blue-600" placeholder="50000">
+                </div>
+
+                <button onclick="saveEntry(); playClickSound();" class="w-full bg-green-600 text-white py-2 rounded-lg text-xs font-bold"><i class="fas fa-square-check mr-1"></i>Save Slip</button>
+            </div>
+
+            <div class="bg-white dark:bg-darkCard rounded-xl shadow-sm border border-gray-100 dark:border-darkBorder overflow-hidden">
+                <div class="table-container overflow-x-auto w-full">
+                    <table class="w-full text-left border-collapse min-w-[700px] text-xs">
+                        <thead>
+                            <tr class="bg-gray-100 dark:bg-gray-800 border-b dark:border-darkBorder font-bold text-gray-700 dark:text-gray-300">
+                                <th class="p-2 w-12 text-center">No</th>
+                                <th class="p-2">Player</th>
+                                <th class="p-2">Match</th>
+                                <th class="p-2 w-36">Type</th>
+                                <th class="p-2 w-20">Odds</th>
+                                <th class="p-2 w-32">Amount</th>
+                                <th class="p-2 w-28 text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="live-entry-table" class="divide-y dark:divide-darkBorder"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <div id="editEntryModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden backdrop-blur-2xs">
+            <div class="bg-white dark:bg-darkCard p-4 rounded-xl shadow-xl border border-gray-200 dark:border-darkBorder max-w-md w-full mx-4 space-y-3">
+                <div class="flex justify-between items-center border-b pb-1.5">
+                    <h3 class="text-sm font-bold text-amber-500"><i class="fas fa-file-pen mr-1.5"></i>Edit Slip Information</h3>
+                    <button onclick="closeEditModal(); playTabSound();" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg">&times;</button>
+                </div>
+                <input type="hidden" id="modal-entry-id">
+                
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Select Match</label>
+                        <select id="modal-entry-match-select" onchange="updateModalOddsDropdown(); playTabSound();" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700"></select>
+                    </div>
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Select Player</label>
+                        <select id="modal-entry-player-select" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700"></select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Bet Type</label>
+                        <select id="modal-entry-type-select" onchange="autoFillModalOdds(); playTabSound();" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700"></select>
+                    </div>
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Inter (Odds)</label>
+                        <input type="text" id="modal-entry-odds" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono font-bold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-2xs mb-0.5 font-medium text-gray-500">Bet Amount (Amount)</label>
+                    <input type="number" id="modal-entry-amount" class="w-full p-2 text-sm border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono font-bold text-blue-600">
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <button onclick="saveModalEntry(); playClickSound();" class="col-span-2 bg-blue-600 text-white py-2 rounded-lg text-xs font-bold"><i class="fas fa-check mr-1"></i>Save Changes</button>
+                    <button onclick="deleteModalEntry(); playTabSound();" class="bg-red-600 text-white py-2 rounded-lg text-xs font-bold"><i class="fas fa-trash-can mr-1"></i>Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <section id="name-tab" class="tab-content hidden space-y-3">
+            <div class="grid grid-cols-3 gap-3">
+                <div class="bg-white dark:bg-darkCard p-4 rounded-xl shadow-sm border border-gray-100 dark:border-darkBorder space-y-3 h-fit">
+                    <h3 class="text-xs font-bold text-purple-600 border-b pb-1"><i class="fas fa-user-plus mr-1.5"></i>Add New Player</h3>
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Player Name</label>
+                        <input type="text" id="player-name" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700">
+                    </div>
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Win % (Commission)</label>
+                        <input type="number" id="player-win-per" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono" value="3" step="0.1">
+                    </div>
+                    <div>
+                        <label class="block text-2xs mb-0.5 font-medium text-gray-500">Lose % (Commission)</label>
+                        <input type="number" id="player-lose-per" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono" value="2" step="0.1">
+                    </div>
+                    <button onclick="savePlayer(); playClickSound();" class="w-full bg-purple-600 text-white py-2 rounded-lg text-xs font-bold"><i class="fas fa-floppy-disk mr-1"></i>Save</button>
+                </div>
+
+                <div class="col-span-2 bg-white dark:bg-darkCard rounded-xl shadow-sm border border-gray-100 dark:border-darkBorder overflow-hidden">
+                    <div class="table-container overflow-x-auto w-full">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-gray-100 dark:bg-gray-800 border-b dark:border-darkBorder font-bold text-gray-700 dark:text-gray-300">
+                                    <th class="p-2 w-12 text-center">No</th>
+                                    <th class="p-2">Name</th>
+                                    <th class="p-2 w-24 text-center">Win %</th>
+                                    <th class="p-2 w-24 text-center">Lose %</th>
+                                    <th class="p-2 w-28 text-center">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="player-list-table" class="divide-y dark:divide-darkBorder"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div id="editPlayerModal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center hidden backdrop-blur-2xs">
+            <div class="bg-white dark:bg-darkCard p-4 rounded-xl shadow-xl border border-gray-200 dark:border-darkBorder max-w-md w-full mx-4 space-y-3">
+                <div class="flex justify-between items-center border-b pb-1.5">
+                    <h3 class="text-sm font-bold text-purple-600"><i class="fas fa-user-gear mr-1.5"></i>Edit Player Configuration</h3>
+                    <button onclick="closePlayerModal(); playTabSound();" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 text-lg">&times;</button>
+                </div>
+                <input type="hidden" id="modal-player-id">
+                
+                <div>
+                    <label class="block text-2xs mb-0.5 font-medium text-gray-500">Player Name</label>
+                    <input type="text" id="modal-player-name" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700">
+                </div>
+                <div>
+                    <label class="block text-2xs mb-0.5 font-medium text-gray-500">Win % (Commission)</label>
+                    <input type="number" id="modal-player-win-per" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono" step="0.1">
+                </div>
+                <div>
+                    <label class="block text-2xs mb-0.5 font-medium text-gray-500">Lose % (Commission)</label>
+                    <input type="number" id="modal-player-lose-per" class="w-full p-2 text-xs border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-mono" step="0.1">
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 pt-1">
+                    <button onclick="saveModalPlayer(); playClickSound();" class="col-span-2 bg-purple-600 text-white py-2 rounded-lg text-xs font-bold"><i class="fas fa-check mr-1"></i>Save Changes</button>
+                    <button onclick="deleteModalPlayer(); playTabSound();" class="bg-red-600 text-white py-2 rounded-lg text-xs font-bold"><i class="fas fa-trash-can mr-1"></i>Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <section id="ledger-tab" class="tab-content hidden space-y-3">
+            <div class="bg-white dark:bg-darkCard rounded-xl shadow-sm border border-gray-100 dark:border-darkBorder overflow-hidden">
+                <div class="p-3 bg-gray-50 dark:bg-gray-800 border-b dark:border-darkBorder">
+                    <h3 class="text-xs font-bold text-orange-500"><i class="fas fa-list-check mr-1.5"></i>Total Bet Summary</h3>
+                </div>
+                <div class="table-container overflow-x-auto w-full">
+                    <table class="w-full text-left border-collapse min-w-[750px] text-xs">
+                        <thead>
+                            <tr class="bg-gray-100 dark:bg-gray-800 border-b dark:border-darkBorder font-bold text-gray-700 dark:text-gray-300">
+                                <th class="p-2">Match</th>
+                                <th class="p-2 text-blue-600 text-right">B+</th>
+                                <th class="p-2 text-teal-600 text-right">B-</th>
+                                <th class="p-2 text-red-600 text-right">G+</th>
+                                <th class="p-2 text-amber-600 text-right">G-</th>
+                                <th class="p-2 font-bold text-right bg-gray-50 dark:bg-gray-900 w-32">TOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ledger-list-table" class="divide-y dark:divide-darkBorder"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="winlose-tab" class="tab-content hidden space-y-2">
+            <div class="bg-white dark:bg-darkCard p-3 rounded-xl shadow-sm border border-gray-100 dark:border-darkBorder flex items-center justify-between">
+                <div><h3 class="text-xs font-bold text-teal-600"><i class="fas fa-scale-balanced mr-1.5"></i>Win/Loss Settlement Table</h3></div>
+                <div class="flex items-center space-x-2 text-xs">
+                    <label class="font-bold text-gray-500"><i class="fas fa-filter mr-1"></i>Filter Player Table:</label>
+                    <select id="winlose-filter-player" onchange="renderWinLoseTable(); playTabSound();" class="p-1.5 border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-bold text-teal-700"></select>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-darkCard rounded-xl shadow-sm border border-gray-100 dark:border-darkBorder overflow-hidden">
+                <div class="table-container overflow-x-auto w-full">
+                    <table class="w-full border-collapse text-center min-w-[1000px] text-2xs">
+                        <thead>
+                            <tr class="bg-gray-100 dark:bg-gray-800 font-bold border-b dark:border-darkBorder text-gray-700 dark:text-gray-300 whitespace-nowrap">
+                                <th class="p-1.5 border-r dark:border-darkBorder w-10 text-2xs">No</th>
+                                <th class="p-1.5 border-r dark:border-darkBorder text-2xs">Name</th>
+                                <th class="p-1.5 border-r dark:border-darkBorder text-2xs">Upper Team</th>
+                                <th class="p-1.5 border-r dark:border-darkBorder w-12">FT</th>
+                                <th class="p-1.5 border-r dark:border-darkBorder text-2xs">Under Team</th>
+                                <th class="p-1.5 border-r dark:border-darkBorder w-12">Odds</th>
+                                <th class="p-1.5 border-r dark:border-darkBorder text-2xs">Type</th>
+                                <th class="p-1.5 border-r dark:border-darkBorder w-28">Amount</th>
+                                <th class="p-1.5 border-r dark:border-darkBorder w-16">%</th>
+                                <th class="p-1.5 border-r border-b dark:border-darkBorder w-28 text-right text-green-600 text-2xs">Win</th>
+                                <th class="p-1.5 w-28 text-right text-red-600 text-2xs">Lose</th>
+                            </tr>
+                        </thead>
+                        <tbody id="winlose-list-table" class="divide-y dark:divide-darkBorder"></tbody>
+                        <tfoot class="border-t-2 dark:border-darkBorder font-bold font-mono text-2xs">
+                            <tr class="bg-gray-50 dark:bg-gray-800/50 whitespace-nowrap">
+                                <td colspan="7" class="p-1.5 text-right border-r dark:border-darkBorder font-sans font-bold text-2xs">TOTAL</td>
+                                <td id="tot-amount" class="p-1.5 text-right border-r dark:border-darkBorder text-blue-600 bg-blue-50/40 dark:bg-blue-950/10 text-2xs">0</td>
+                                <td class="p-1.5 border-r dark:border-darkBorder bg-gray-100/50 dark:bg-gray-800/50"></td>
+                                <td id="tot-win" class="p-1.5 text-right border-r dark:border-darkBorder text-green-600 text-2xs">0</td>
+                                <td id="tot-loss" class="p-1.5 text-right text-red-600 text-2xs">0</td>
+                            </tr>
+                            <tr class="bg-gray-100 dark:bg-gray-800 whitespace-nowrap">
+                                <td colspan="7" class="p-1.5 text-right border-r dark:border-darkBorder font-sans text-2xs">COMMISSION</td>
+                                <td id="comm-rate" class="p-1.5 text-center text-gray-500 border-r dark:border-darkBorder font-sans font-normal text-2xs">Mixed</td>
+                                <td class="border-r dark:border-darkBorder bg-gray-100/50 dark:bg-gray-800"></td>
+                                <td id="comm-win-deduct" class="p-1.5 text-right border-r dark:border-darkBorder text-2xs">-0</td>
+                                <td id="comm-loss-deduct" class="p-1.5 text-right text-2xs">-0</td>
+                            </tr>
+                            <tr class="bg-emerald-50/60 dark:bg-emerald-950/20 whitespace-nowrap">
+                                <td colspan="7" class="p-1.5 text-right border-r dark:border-darkBorder font-sans text-2xs">NET WIN / NET LOSS</td>
+                                <td class="border-r dark:border-darkBorder bg-gray-100/50 dark:bg-emerald-950/20"></td>
+                                <td class="border-r dark:border-darkBorder bg-gray-100/50 dark:bg-emerald-950/20"></td>
+                                <td id="net-win-after-comm" class="p-1.5 text-right border-r dark:border-darkBorder text-emerald-600 font-bold text-2xs">0</td>
+                                <td id="net-loss-after-comm" class="p-1.5 text-right text-rose-600 font-bold text-2xs">0</td>
+                            </tr>
+                            <tr class="bg-blue-50 dark:bg-blue-950/40 text-2xs whitespace-nowrap">
+                                <td colspan="7" class="p-1.5 text-right border-r dark:border-darkBorder font-sans font-bold text-xs">All TOTAL</td>
+                                <td colspan="4" id="net-result" class="p-1.5 text-center font-sans font-bold text-sm">0</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section id="slipcopy-tab" class="tab-content hidden space-y-3">
+            <div class="bg-white dark:bg-darkCard p-4 rounded-xl shadow-sm border border-gray-100 dark:border-darkBorder flex items-center justify-between">
+                <div>
+                    <h3 class="text-xs font-bold text-amber-600 flex items-center gap-1"><i class="fas fa-clipboard-list mr-1"></i>Slip Copy</h3>
+                    <p class="text-2xs text-gray-400">COPY AND SENT</p>
+                </div>
+                <div class="flex items-center space-x-2 text-xs">
+                    <label class="font-bold text-gray-500"><i class="fas fa-id-card mr-1"></i>Select Player Name:</label>
+                    <select id="slipcopy-filter-player" onchange="renderSlipCopyPanels(); playTabSound();" class="p-2 border rounded-lg dark:bg-gray-800 dark:border-gray-700 font-bold bg-amber-50/50 dark:bg-amber-950/20 text-amber-800 dark:text-amber-200 focus:outline-amber-500"></select>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div class="bg-white dark:bg-darkCard p-4 rounded-xl shadow-sm border border-gray-100 dark:border-darkBorder space-y-2">
+                    <div class="flex justify-between items-center border-b pb-1">
+                        <span class="text-xs font-bold text-green-600 flex items-center gap-1"><i class="fas fa-circle-check text-green-600 mr-1"></i> Win Column Amount</span>
+                        <button onclick="copyToClipboard('win-copy-box')" class="bg-green-600 hover:bg-green-700 text-white text-2xs font-bold px-3 py-1.5 rounded-lg shadow-sm active:scale-95 transition-transform">
+                            <i class="fas fa-copy mr-1"></i> Copy Win Box
+                        </button>
+                    </div>
+                    <textarea id="win-copy-box" readonly class="w-full h-72 p-3 bg-gray-50 dark:bg-gray-900 border rounded-lg font-mono font-bold text-sm text-green-600 dark:text-green-4xl tracking-wider focus:outline-none resize-none leading-relaxed" placeholder="No data available..."></textarea>
+                </div>
+
+                <div class="bg-white dark:bg-darkCard p-4 rounded-xl shadow-sm border border-gray-100 dark:border-darkBorder space-y-2">
+                    <div class="flex justify-between items-center border-b pb-1">
+                        <span class="text-xs font-bold text-red-600 flex items-center gap-1"><i class="fas fa-circle-xmark text-red-600 mr-1"></i> Lose Column Amount</span>
+                        <button onclick="copyToClipboard('lose-copy-box')" class="bg-red-600 hover:bg-red-700 text-white text-2xs font-bold px-3 py-1.5 rounded-lg shadow-sm active:scale-95 transition-transform">
+                            <i class="fas fa-copy mr-1"></i> Copy Lose Box
+                        </button>
+                    </div>
+                    <textarea id="lose-copy-box" readonly class="w-full h-72 p-3 bg-gray-50 dark:bg-gray-900 border rounded-lg font-mono font-bold text-sm text-red-600 dark:text-red-4xl tracking-wider focus:outline-none resize-none leading-relaxed" placeholder="No data available..."></textarea>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: 'var(--dark-bg)',
+                        darkCard: 'var(--dark-card)',
+                        darkBorder: 'var(--dark-border)'
+                    },
+                    fontSize: {
+                        '2xs': '0.65rem'
+                    }
+                }
+            }
+        }
+
+        const audioFileName = "click.mp3"; 
+        const clickSound = new Audio(audioFileName);
+        
+        const tabAudioFileName = "tabsound.mp3";
+        const tabSound = new Audio(tabAudioFileName);
+
+        function playClickSound() {
+            try {
+                clickSound.currentTime = 0; 
+                clickSound.play();
+            } catch (e) {
+                console.log("Audio play blocked or error:", e);
+            }
+        }
+
+        function playTabSound() {
+            try {
+                tabSound.currentTime = 0;
+                tabSound.play();
+            } catch (e) {
+                console.log("Tab audio play blocked or error:", e);
+            }
+        }
+
+        let matches = JSON.parse(localStorage.getItem('db_tbl_matches')) || [];
+        let players = JSON.parse(localStorage.getItem('db_tbl_players')) || [
+            { id: "1", name: "Player A", winPer: 3.0, losePer: 2.0 }
+        ];
+        let entries = JSON.parse(localStorage.getItem('db_tbl_entries')) || [];
+
+        function saveToStorage() {
+            localStorage.setItem('db_tbl_matches', JSON.stringify(matches));
+            localStorage.setItem('db_tbl_players', JSON.stringify(players));
+            localStorage.setItem('db_tbl_entries', JSON.stringify(entries));
+        }
+
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark'); html.classList.add('light');
+            } else {
+                html.classList.remove('light'); html.classList.add('dark');
+            }
+        });
+
+        document.getElementById('clearDataBtn').addEventListener('click', () => {
+            playTabSound();
+            if (confirm("Warning: All Entry and Match data will be permanently deleted. Player Name List will be kept intact. Are you sure?")) {
+                matches = [];
+                entries = [];
+                saveToStorage();
+                
+                renderMatchTable();
+                renderLiveEntryTable();
+                renderPlayerTable();
+                switchTab('match-tab');
+                alert("Match and Slip entry records successfully cleared.");
+            }
+        });
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(tabId).classList.remove('hidden');
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                // Preserved precise structural class configurations while supporting embedded icons cleanly
+                if(btn.id === 'default-tab' || btn.innerText.includes('Match')) {
+                    btn.className = "tab-btn py-2 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-4xl hover:bg-white/50 transition-all";
+                } else if(btn.innerText.includes('Slip Copy')) {
+                    btn.className = "tab-btn py-2 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-4xl hover:bg-white/50 bg-amber-100 dark:bg-amber-950/40 text-amber-700 transition-all";
+                } else {
+                    btn.className = "tab-btn py-2 text-xs font-bold rounded-lg text-gray-600 dark:text-gray-4xl hover:bg-white/50 transition-all";
+                }
+            });
+            
+            const activeBtn = event ? event.currentTarget : document.getElementById('default-tab');
+            if(activeBtn) {
+                activeBtn.className = "tab-btn py-2 text-xs font-bold rounded-lg bg-white dark:bg-gray-700 shadow-sm text-blue-600 dark:text-white transition-all";
+            }
+
+            if(tabId === 'entry-tab') { updateEntryDropdowns(); }
+            if(tabId === 'ledger-tab') { renderLedgerTable(); }
+            if(tabId === 'winlose-tab') { updateWinLoseFilterDropdown(); renderWinLoseTable(); }
+            if(tabId === 'slipcopy-tab') { updateSlipCopyFilterDropdown(); renderSlipCopyPanels(); }
+        }
+
+        // MATCH CORE ENGINE
+        function saveMatch() {
+            const home = document.getElementById('home-team').value.trim();
+            const away = document.getElementById('away-team').value.trim();
+            const bodyOdds = document.getElementById('body-odds').value.trim() || "0";
+            const goalOdds = document.getElementById('goal-odds').value.trim() || "0";
+            const homeScore = parseInt(document.getElementById('home-score').value) || 0;
+            const awayScore = parseInt(document.getElementById('away-score').value) || 0;
+
+            if (!home || !away) return alert("Please fill in both team names.");
+
+            matches.push({ id: Date.now().toString(), home, away, bodyOdds, goalOdds, homeScore, awayScore });
+            resetMatchForm(); saveToStorage(); renderMatchTable();
+        }
+
+        function resetMatchForm() {
+            document.getElementById('home-team').value = ''; document.getElementById('away-team').value = '';
+            document.getElementById('body-odds').value = ''; document.getElementById('goal-odds').value = '';
+            document.getElementById('home-score').value = '0'; document.getElementById('away-score').value = '0';
+        }
+
+        function renderMatchTable() {
+            const tbody = document.getElementById('match-list-table'); tbody.innerHTML = '';
+            matches.forEach((m, idx) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-yellow-100 dark:hover:bg-yellow-950/40 transition-colors">
+                        <td class="p-2 text-center font-mono text-gray-400 text-xs">${idx + 1}</td>
+                        <td class="p-2 font-bold text-gray-800 dark:text-gray-200 text-xs">${m.home} <span class="text-gray-400 text-2xs">VS</span> ${m.away}</td>
+                        <td class="p-2 font-mono font-bold text-emerald-600 text-xs">${m.bodyOdds}</td>
+                        <td class="p-2 font-mono font-bold text-orange-600 text-xs">${m.goalOdds}</td>
+                        <td class="p-2 font-mono text-center text-xs"><span class="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded font-bold">${m.homeScore}-${m.awayScore}</span></td>
+                        <td class="p-2 text-center space-x-1">
+                            <button onclick="openEditMatchModal('${m.id}'); playTabSound();" class="bg-amber-500 text-white px-2 py-1 rounded text-2xs font-bold"><i class="fas fa-pen mr-1"></i>Edit/Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // POPUP MODAL ENGINE FOR MATCH EDIT
+        function openEditMatchModal(matchId) {
+            const m = matches.find(x => x.id === matchId); if(!m) return;
+            document.getElementById('modal-match-id').value = m.id;
+            document.getElementById('modal-home-team').value = m.home;
+            document.getElementById('modal-away-team').value = m.away;
+            document.getElementById('modal-body-odds').value = m.bodyOdds;
+            document.getElementById('modal-goal-odds').value = m.goalOdds;
+            document.getElementById('modal-home-score').value = m.homeScore;
+            document.getElementById('modal-away-score').value = m.awayScore;
+            document.getElementById('editMatchModal').classList.remove('hidden');
+        }
+
+        function closeMatchModal() {
+            document.getElementById('editMatchModal').classList.add('hidden');
+        }
+
+        function saveModalMatch() {
+            const id = document.getElementById('modal-match-id').value;
+            const home = document.getElementById('modal-home-team').value.trim();
+            const away = document.getElementById('modal-away-team').value.trim();
+            const bodyOdds = document.getElementById('modal-body-odds').value.trim() || "0";
+            const goalOdds = document.getElementById('modal-goal-odds').value.trim() || "0";
+            const homeScore = parseInt(document.getElementById('modal-home-score').value) || 0;
+            const awayScore = parseInt(document.getElementById('modal-away-score').value) || 0;
+
+            if (!home || !away) return alert("Please fill in both team names.");
+
+            const index = matches.findIndex(m => m.id === id);
+            if(index > -1) {
+                matches[index] = { ...matches[index], home, away, bodyOdds, goalOdds, homeScore, awayScore };
+                saveToStorage(); renderMatchTable(); closeMatchModal();
+            }
+        }
+
+        function deleteModalMatch() {
+            const id = document.getElementById('modal-match-id').value;
+            if(confirm("Are you sure you want to delete this match?")) {
+                matches = matches.filter(m => m.id !== id);
+                entries = entries.filter(e => e.matchId !== id);
+                saveToStorage(); renderMatchTable(); closeMatchModal();
+            }
+        }
+
+        // SLIP ENTRY ENGINE
+        function updateEntryDropdowns() {
+            const mSel = document.getElementById('entry-match-select'); mSel.innerHTML = '';
+            matches.forEach(m => mSel.innerHTML += `<option value="${m.id}">${m.home} Vs ${m.away}</option>`);
+
+            const pSel = document.getElementById('entry-player-select'); pSel.innerHTML = '';
+            players.forEach(p => pSel.innerHTML += `<option value="${p.id}">${p.name}</option>`);
+            updateEntryOddsDropdown();
+            renderLiveEntryTable();
+        }
+
+        function updateEntryOddsDropdown() {
+            const mId = document.getElementById('entry-match-select').value;
+            const tSel = document.getElementById('entry-type-select'); tSel.innerHTML = '';
+            const m = matches.find(x => x.id === mId); if(!m) return;
+
+            tSel.innerHTML += `<option value="Body-Home">${m.home} (Body)</option>`;
+            tSel.innerHTML += `<option value="Body-Away">${m.away} (Body)</option>`;
+            tSel.innerHTML += `<option value="Goal-Over">Goal Over</option>`;
+            tSel.innerHTML += `<option value="Goal-Under">Goal Under</option>`;
+            autoFillOdds();
+        }
+
+        function autoFillOdds() {
+            const mId = document.getElementById('entry-match-select').value;
+            const type = document.getElementById('entry-type-select').value;
+            const m = matches.find(x => x.id === mId); if(!m) return;
+            document.getElementById('entry-odds').value = type.startsWith('Body') ? m.bodyOdds : m.goalOdds;
+        }
+
+        function saveEntry() {
+            const matchId = document.getElementById('entry-match-select').value;
+            const playerId = document.getElementById('entry-player-select').value;
+            const type = document.getElementById('entry-type-select').value;
+            const odds = document.getElementById('entry-odds').value.trim();
+            const amount = parseInt(document.getElementById('entry-amount').value) || 0;
+
+            if(!matchId || !playerId || amount <= 0) return alert("Invalid slip configurations.");
+
+            entries.push({ id: Date.now().toString(), matchId, playerId, type, odds, amount });
+            document.getElementById('entry-amount').value = '';
+            saveToStorage(); renderLiveEntryTable();
+        }
+
+        function renderLiveEntryTable() {
+            const tbody = document.getElementById('live-entry-table'); tbody.innerHTML = '';
+            const selectElement = document.getElementById('entry-player-select');
+            const selectedPlayerId = selectElement ? selectElement.value : '';
+
+            const filteredEntries = selectedPlayerId ? entries.filter(e => e.playerId === selectedPlayerId) : entries;
+
+            filteredEntries.forEach((e, idx) => {
+                const m = matches.find(x => x.id === e.matchId) || {home:'N/A', away:'N/A'};
+                const p = players.find(x => x.id === e.playerId) || {name:'N/A'};
+                tbody.innerHTML += `
+                    <tr class="hover:bg-yellow-100 dark:hover:bg-yellow-950/40 transition-colors">
+                        <td class="p-2 text-center font-mono text-gray-400 text-xs">${idx + 1}</td>
+                        <td class="p-2 font-bold text-xs">${p.name}</td>
+                        <td class="p-2 text-gray-600 dark:text-gray-400 text-xs">${m.home} Vs ${m.away}</td>
+                        <td class="p-2 font-semibold text-blue-500 text-xs">${e.type}</td>
+                        <td class="p-2 font-mono font-bold text-xs">${e.odds}</td>
+                        <td class="p-2 font-mono font-bold text-right text-xs">${e.amount.toLocaleString()}</td>
+                        <td class="p-2 text-center space-x-1">
+                            <button onclick="openEditModal('${e.id}'); playTabSound();" class="bg-amber-500 text-white px-2 py-0.5 rounded text-2xs font-bold"><i class="fas fa-pen mr-1"></i>Edit/Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function openEditModal(entryId) {
+            const e = entries.find(x => x.id === entryId); if(!e) return;
+            document.getElementById('modal-entry-id').value = e.id;
+
+            const mSel = document.getElementById('modal-entry-match-select'); mSel.innerHTML = '';
+            matches.forEach(m => mSel.innerHTML += `<option value="${m.id}">${m.home} Vs ${m.away}</option>`);
+            mSel.value = e.matchId;
+
+            const pSel = document.getElementById('modal-entry-player-select'); pSel.innerHTML = '';
+            players.forEach(p => pSel.innerHTML += `<option value="${p.id}">${p.name}</option>`);
+            pSel.value = e.playerId;
+
+            updateModalOddsDropdown();
+            document.getElementById('modal-entry-type-select').value = e.type;
+            document.getElementById('modal-entry-odds').value = e.odds;
+            document.getElementById('modal-entry-amount').value = e.amount;
+
+            document.getElementById('editEntryModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editEntryModal').classList.add('hidden');
+        }
+
+        // MODAL CONFIGURATIONS
+        function updateModalOddsDropdown() {
+            const mId = document.getElementById('modal-entry-match-select').value;
+            const tSel = document.getElementById('modal-entry-type-select'); tSel.innerHTML = '';
+            const m = matches.find(x => x.id === mId); if(!m) return;
+
+            tSel.innerHTML += `<option value="Body-Home">${m.home} (Body)</option>`;
+            tSel.innerHTML += `<option value="Body-Away">${m.away} (Body)</option>`;
+            tSel.innerHTML += `<option value="Goal-Over">Goal Over</option>`;
+            tSel.innerHTML += `<option value="Goal-Under">Goal Under</option>`;
+            autoFillModalOdds();
+        }
+
+        function autoFillModalOdds() {
+            const mId = document.getElementById('modal-entry-match-select').value;
+            const type = document.getElementById('modal-entry-type-select').value;
+            const m = matches.find(x => x.id === mId); if(!m) return;
+            document.getElementById('modal-entry-odds').value = type.startsWith('Body') ? m.bodyOdds : m.goalOdds;
+        }
+
+        function saveModalEntry() {
+            const id = document.getElementById('modal-entry-id').value;
+            const matchId = document.getElementById('modal-entry-match-select').value;
+            const playerId = document.getElementById('modal-entry-player-select').value;
+            const type = document.getElementById('modal-entry-type-select').value;
+            const odds = document.getElementById('modal-entry-odds').value.trim();
+            const amount = parseInt(document.getElementById('modal-entry-amount').value) || 0;
+
+            if(!matchId || !playerId || amount <= 0) return alert("Invalid slip configurations.");
+
+            const idx = entries.findIndex(x => x.id === id);
+            if(idx > -1) {
+                entries[idx] = { ...entries[idx], matchId, playerId, type, odds, amount };
+                saveToStorage(); renderLiveEntryTable(); closeEditModal();
+            }
+        }
+
+        function deleteModalEntry() {
+            const id = document.getElementById('modal-entry-id').value;
+            if(confirm("Are you sure you want to delete this slip?")) { 
+                entries = entries.filter(x => x.id !== id); 
+                saveToStorage(); renderLiveEntryTable(); closeEditModal(); 
+            }
+        }
+
+        // PLAYER ENGINE
+        function savePlayer() {
+            const name = document.getElementById('player-name').value.trim();
+            const winPer = parseFloat(document.getElementById('player-win-per').value) || 0;
+            const losePer = parseFloat(document.getElementById('player-lose-per').value) || 0;
+
+            if(!name) return alert("Please enter a name.");
+
+            players.push({ id: Date.now().toString(), name, winPer, losePer });
+            document.getElementById('player-name').value = '';
+            saveToStorage(); renderPlayerTable();
+        }
+
+        function renderPlayerTable() {
+            const tbody = document.getElementById('player-list-table'); tbody.innerHTML = '';
+            players.forEach((p, idx) => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-yellow-100 dark:hover:bg-yellow-950/40 transition-colors">
+                        <td class="p-2 text-center font-mono text-gray-400 text-xs">${idx + 1}</td>
+                        <td class="p-2 font-bold text-xs">${p.name}</td>
+                        <td class="p-2 text-center font-mono text-green-600 font-bold text-xs">${p.winPer}%</td>
+                        <td class="p-2 text-center font-mono text-red-600 font-bold text-xs">${p.losePer}%</td>
+                        <td class="p-2 text-center space-x-1">
+                            <button onclick="openEditPlayerModal('${p.id}'); playTabSound();" class="bg-amber-500 text-white px-2 py-0.5 rounded text-2xs font-bold"><i class="fas fa-user-pen mr-1"></i>Edit/Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        // POPUP MODAL ENGINE FOR PLAYER EDIT
+        function openEditPlayerModal(playerId) {
+            const p = players.find(x => x.id === playerId); if(!p) return;
+            document.getElementById('modal-player-id').value = p.id;
+            document.getElementById('modal-player-name').value = p.name;
+            document.getElementById('modal-player-win-per').value = p.winPer;
+            document.getElementById('modal-player-lose-per').value = p.losePer;
+            document.getElementById('editPlayerModal').classList.remove('hidden');
+        }
+
+        function closePlayerModal() {
+            document.getElementById('editPlayerModal').classList.add('hidden');
+        }
+
+        function saveModalPlayer() {
+            const id = document.getElementById('modal-player-id').value;
+            const name = document.getElementById('modal-player-name').value.trim();
+            const winPer = parseFloat(document.getElementById('modal-player-win-per').value) || 0;
+            const losePer = parseFloat(document.getElementById('modal-player-lose-per').value) || 0;
+
+            if(!name) return alert("Please enter a name.");
+
+            const idx = players.findIndex(x => x.id === id);
+            if(idx > -1) {
+                players[idx] = { id, name, winPer, losePer };
+                saveToStorage(); renderPlayerTable(); closePlayerModal();
+            }
+        }
+
+        // SUPPORTS USER PURGES CLEANLY
+        function deleteModalPlayer() {
+            const id = document.getElementById('modal-player-id').value;
+            if(confirm("Are you sure you want to delete this player configuration?")) { 
+                players = players.filter(x => x.id !== id); 
+                saveToStorage(); renderPlayerTable(); closePlayerModal(); 
+            }
+        }
+
+        // LEDGER COMPUTATION
+        function renderLedgerTable() {
+            const tbody = document.getElementById('ledger-list-table'); tbody.innerHTML = '';
+            matches.forEach(m => {
+                let bHome = 0, bAway = 0, gOver = 0, gUnder = 0;
+                entries.filter(e => e.matchId === m.id).forEach(e => {
+                    if (e.type === 'Body-Home') bHome += e.amount;
+                    if (e.type === 'Body-Away') bAway += e.amount;
+                    if (e.type === 'Goal-Over') gOver += e.amount;
+                    if (e.type === 'Goal-Under') gUnder += e.amount;
+                });
+                let tot = bHome + bAway + gOver + gUnder;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-yellow-100 dark:hover:bg-yellow-950/40 transition-colors font-mono text-xs">
+                        <td class="p-2 font-sans font-bold text-left text-gray-800 dark:text-gray-200 text-xs">${m.home} Vs ${m.away}</td>
+                        <td class="p-2 text-right text-blue-600 font-bold">${bHome.toLocaleString()}</td>
+                        <td class="p-2 text-right text-teal-600 font-bold">${bAway.toLocaleString()}</td>
+                        <td class="p-2 text-right text-red-600 font-bold">${gOver.toLocaleString()}</td>
+                        <td class="p-2 text-right text-amber-600 font-bold">${gUnder.toLocaleString()}</td>
+                        <td class="p-2 text-right bg-gray-50 dark:bg-gray-900 font-bold text-gray-900 dark:text-white">${tot.toLocaleString()}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // ANALYSIS SYSTEM
+        function calculateWinLoss(entry, match) {
+            const type = entry.type; const oddsStr = entry.odds; const amt = entry.amount;
+            const hScore = match.homeScore; const aScore = match.awayScore;
+            const totalGoals = hScore + aScore; const goalDiff = hScore - aScore;
+
+            let win = 0, loss = 0;
+            let sign = oddsStr.includes('-') ? '-' : '+';
+            let parts = oddsStr.split(/[+-]/);
+            let baseGoal = parseFloat(parts[0]) || 0;
+            let subOdds = parseFloat(parts[1]) || 0;
+
+            if (type === 'Body-Home' || type === 'Body-Away') {
+                let isHomeBet = (type === 'Body-Home');
+                if (sign === '-') {
+                    if (goalDiff > baseGoal) { isHomeBet ? (win = amt) : (loss = amt); }
+                    else if (goalDiff === baseGoal) {
+                        if (isHomeBet) loss = amt * (subOdds / 100); else win = amt * (subOdds / 100);
+                    } else { isHomeBet ? (loss = amt) : (win = amt); }
+                } else {
+                    if (goalDiff > baseGoal) { isHomeBet ? (win = amt) : (loss = amt); }
+                    else if (goalDiff === baseGoal) {
+                        if (isHomeBet) win = amt * (subOdds / 100); else loss = amt * (subOdds / 100);
+                    } else { isHomeBet ? (loss = amt) : (win = amt); }
+                }
+            } 
+            else if (type === 'Goal-Over' || type === 'Goal-Under') {
+                let isOverBet = (type === 'Goal-Over');
+                if (sign === '+') {
+                    if (totalGoals > baseGoal) { isOverBet ? (win = amt) : (loss = amt); }
+                    else if (totalGoals === baseGoal) {
+                        if (isOverBet) win = amt * (subOdds / 100); else loss = amt * (subOdds / 100);
+                    } else { isOverBet ? (loss = amt) : (win = amt); }
+                } else {
+                    if (totalGoals > baseGoal) { isOverBet ? (win = amt) : (loss = amt); }
+                    else if (totalGoals === baseGoal) {
+                        if (isOverBet) loss = amt * (subOdds / 100); else win = amt * (subOdds / 100);
+                    } else { isOverBet ? (loss = amt) : (win = amt); }
+                }
+            }
+            return { win: Math.round(win), loss: Math.round(loss) };
+        }
+
+        function updateWinLoseFilterDropdown() {
+            const filter = document.getElementById('winlose-filter-player'); const cur = filter.value;
+            filter.innerHTML = '<option value="All">Show All</option>';
+            players.forEach(p => filter.innerHTML += `<option value="${p.id}">${p.name}</option>`);
+            filter.value = cur;
+        }
+
+        function renderWinLoseTable() {
+            const filterVal = document.getElementById('winlose-filter-player').value;
+            const tbody = document.getElementById('winlose-list-table'); tbody.innerHTML = '';
+
+            let totalAmount = 0, totalWin = 0, totalLoss = 0;
+            const filteredEntries = filterVal === 'All' ? entries : entries.filter(e => e.playerId === filterVal);
+
+            filteredEntries.forEach((e, idx) => {
+                const match = matches.find(m => m.id === e.matchId);
+                const player = players.find(p => p.id === e.playerId) || {name: 'N/A', winPer:0, losePer:0};
+                if(!match) return;
+
+                const res = calculateWinLoss(e, match);
+                totalAmount += e.amount; totalWin += res.win; totalLoss += res.loss;
+                
+                let typeDisplay = (e.type === 'Body-Home') ? match.home : (e.type === 'Body-Away' ? match.away : (e.type === 'Goal-Over' ? 'GoalOver' : 'GoalUnder'));
+
+                let pctText = "0";
+                let pctClass = "text-gray-400 dark:text-gray-500 font-bold text-2xs";
+                
+                if (res.win > 0) {
+                    let pctValue = (res.win / e.amount) * 100;
+                    pctText = `+${Math.round(pctValue)}`;
+                    pctClass = "text-green-600 dark:text-green-4xl font-bold bg-green-50 dark:bg-green-950/20 px-1 py-0.5 rounded text-2xs";
+                } else if (res.loss > 0) {
+                    let pctValue = (res.loss / e.amount) * 100;
+                    pctText = `-${Math.round(pctValue)}`;
+                    pctClass = "text-red-600 dark:text-red-4xl font-bold bg-red-50 dark:bg-red-950/20 px-1 py-0.5 rounded text-2xs";
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-yellow-300/50 dark:hover:bg-yellow-800/40 transition-colors text-2xs whitespace-nowrap">
+                        <td class="p-1.5 border-r border-b dark:border-darkBorder font-mono text-gray-400">${idx + 1}</td>
+                        <td class="p-1.5 border-r border-b dark:border-darkBorder font-mono font-bold bg-red-500 text-white">${player.name}</td>
+                        <td class="p-1.5 border-r border-b dark:border-darkBorder">${match.home}</td>
+                        <td class="p-1.5 border-r border-b dark:border-darkBorder font-mono font-bold bg-yellow-300 text-black">${match.homeScore}-${match.awayScore}</td>
+                        <td class="p-1.5 border-r border-b dark:border-darkBorder">${match.away}</td>
+                        <td class="p-1.5 border-r border-b dark:border-darkBorder font-mono font-bold bg-blue-500 text-white">${e.odds}</td>
+                        <td class="p-1.5 border-r border-b dark:border-darkBorder font-bold text-left pl-1.5 bg-green-500 text-white">${typeDisplay}</td>
+                        <td class="p-1.5 border-r border-b dark:border-darkBorder font-mono text-right font-bold bg-blue-50/50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-4xl">${e.amount.toLocaleString()}</td>
+                        <td class="p-1.5 border-r border-b dark:border-darkBorder font-mono text-center"><span class="${pctClass}">${pctText}</span></td>
+                        <td class="p-1.5 border-r border-b dark:border-darkBorder font-mono text-right text-green-600 font-bold bg-green-50/20">${res.win > 0 ? res.win.toLocaleString() : '0'}</td>
+                        <td class="p-1.5 border-b dark:border-darkBorder font-mono text-right text-red-600 font-bold bg-red-50/20">${res.loss > 0 ? res.loss.toLocaleString() : '0'}</td>
+                    </tr>
+                `;
+            });
+
+            let commWinDeduct = 0, commLossDeduct = 0;
+            if (filterVal !== 'All') {
+                const activePlayer = players.find(p => p.id === filterVal);
+                if (activePlayer) {
+                    commWinDeduct = totalWin * (activePlayer.winPer / 100);
+                    commLossDeduct = totalLoss * (activePlayer.losePer / 100);
+                    document.getElementById('comm-rate').innerText = `${activePlayer.winPer}/${activePlayer.losePer}`;
+                }
+            } else {
+                commWinDeduct = totalWin * 0.015; commLossDeduct = totalLoss * 0.015;
+                document.getElementById('comm-rate').innerText = `Avg 1.5%`;
+            }
+
+            let netWinAfterComm = totalWin - commWinDeduct;
+            let netLossAfterComm = totalLoss - commLossDeduct;
+            let netResult = netWinAfterComm - netLossAfterComm;
+            
+            document.getElementById('tot-amount').innerText = totalAmount.toLocaleString();
+            document.getElementById('tot-win').innerText = totalWin.toLocaleString();
+            document.getElementById('tot-loss').innerText = totalLoss.toLocaleString();
+            document.getElementById('comm-win-deduct').innerText = `-${Math.round(commWinDeduct).toLocaleString()}`;
+            document.getElementById('comm-loss-deduct').innerText = `-${Math.round(commLossDeduct).toLocaleString()}`;
+
+            document.getElementById('net-win-after-comm').innerText = Math.round(netWinAfterComm).toLocaleString();
+            document.getElementById('net-loss-after-comm').innerText = Math.round(netLossAfterComm).toLocaleString();
+
+            const netElement = document.getElementById('net-result');
+            netElement.innerText = `${Math.round(netResult).toLocaleString()}`;
+            netElement.className = netResult >= 0 
+                ? "p-1.5 text-center font-sans font-bold text-green-600 bg-green-100 dark:bg-green-950/40 text-xs" 
+                : "p-1.5 text-center font-sans font-bold text-red-600 bg-red-100 dark:bg-red-950/40 text-xs";
+        }
+
+        function updateSlipCopyFilterDropdown() {
+            const filter = document.getElementById('slipcopy-filter-player');
+            const curValue = filter.value;
+            filter.innerHTML = '';
+            
+            players.forEach(p => {
+                filter.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+            });
+            if (curValue && players.find(x => x.id === curValue)) {
+                filter.value = curValue;
+            } else if (players.length > 0) {
+                filter.value = players[0].id;
+            }
+        }
+
+        function renderSlipCopyPanels() {
+            const pId = document.getElementById('slipcopy-filter-player').value;
+            const winBox = document.getElementById('win-copy-box');
+            const loseBox = document.getElementById('lose-copy-box');
+
+            if (!pId) {
+                winBox.value = "No player found..."; loseBox.value = "No player found..."; return;
+            }
+
+            const pEntries = entries.filter(e => e.playerId === pId);
+            let winLines = [];
+            let loseLines = [];
+
+            pEntries.forEach(e => {
+                const match = matches.find(m => m.id === e.matchId);
+                if (!match) return;
+
+                const res = calculateWinLoss(e, match);
+                if (res.win > 0) { winLines.push(res.win); } else { winLines.push(0); }
+                if (res.loss > 0) { loseLines.push(`-${res.loss}`); } else { loseLines.push(0); }
+            });
+
+            winBox.value = winLines.length > 0 ? winLines.join('\n') : "0";
+            loseBox.value = loseLines.length > 0 ? loseLines.join('\n') : "0";
+        }
+
+        function copyToClipboard(boxId) {
+            playTabSound();
+            const textarea = document.getElementById(boxId);
+            if (textarea.value === "No player found..." || textarea.value === "") return;
+            
+            textarea.select();
+            textarea.setSelectionRange(0, 99999);
+
+            try {
+                navigator.clipboard.writeText(textarea.value);
+                alert("Copied to clipboard!");
+            } catch (err) {
+                document.execCommand('copy');
+                alert("Copied to clipboard!");
+            }
+        }
+
+        const w = Math.round(Math.min(window.screen.width, window.screen.height));
+        const h = Math.round(Math.max(window.screen.width, window.screen.height));
+
+        const correctUsername = `${w}1DBD${h}`; 
+        const correctPassword = (w * h).toString(); 
+
+        function handleLogin() {
+            const userIn = document.getElementById("usernameInput").value.trim().toUpperCase();
+            const passIn = document.getElementById("passwordInput").value.trim();
+            const rememberMeChecked = document.getElementById("rememberMe").checked;
+            const errorCard = document.getElementById("errorCard");
+
+            if (userIn === correctUsername && passIn === correctPassword) {
+                if (rememberMeChecked) {
+                    localStorage.setItem('saved_username', userIn);
+                    localStorage.setItem('saved_password', passIn);
+                    localStorage.setItem('remember_me_status', 'true');
+                } else {
+                    localStorage.removeItem('saved_username');
+                    localStorage.removeItem('saved_password');
+                    localStorage.setItem('remember_me_status', 'false');
+                }
+                document.getElementById("loginOverlay").style.display = "none";
+            } else {
+                errorCard.style.display = "block";
+                errorCard.innerHTML = `
+                    <div><i class="fas fa-triangle-exclamation mr-1"></i> Invalid credentials provided</div>
+                    <div style="margin-top: 4px;">ERROR CODE: <b>${correctUsername}</b></div>
+                `;
+            }
+        }
+
+        window.onload = function() {
+            const savedUser = localStorage.getItem('saved_username');
+            const savedPass = localStorage.getItem('saved_password');
+            const isRemembered = localStorage.getItem('remember_me_status');
+
+            if (isRemembered === 'true' && savedUser && savedPass) {
+                document.getElementById("usernameInput").value = savedUser;
+                document.getElementById("passwordInput").value = savedPass;
+                document.getElementById("rememberMe").checked = true;
+            }
+
+            renderMatchTable(); renderLiveEntryTable(); renderPlayerTable();
+        };
+    </script>
+</body>
+</html>
