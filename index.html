@@ -509,11 +509,11 @@
                         <thead>
                             <tr class="bg-gray-100 dark:bg-gray-800 border-b dark:border-darkBorder font-bold text-gray-700 dark:text-gray-300">
                                 <th class="p-2">Match</th>
-                                <th class="p-2 text-blue-600 text-right">B+</th>
-                                <th class="p-2 text-teal-600 text-right">B-</th>
-                                <th class="p-2 text-red-600 text-right">G+</th>
-                                <th class="p-2 text-amber-600 text-right">G-</th>
-                                <th class="p-2 font-bold text-right bg-gray-50 dark:bg-gray-900 w-32">TOTAL</th>
+                                <th class="p-2 text-blue-600 text-center">Home Body</th>
+                                <th class="p-2 text-teal-600 text-center">Away Body</th>
+                                <th class="p-2 text-red-600 text-center">Goal-Over</th>
+                                <th class="p-2 text-amber-600 text-center">Goal-Under</th>
+                                <th class="p-2 font-bold text-center bg-gray-50 dark:bg-gray-900 w-32">TOTAL</th>
                             </tr>
                         </thead>
                         <tbody id="ledger-list-table" class="divide-y dark:divide-darkBorder"></tbody>
@@ -1027,11 +1027,11 @@
                 tbody.innerHTML += `
                     <tr class="hover:bg-yellow-100 dark:hover:bg-yellow-950/40 transition-colors font-mono text-xs">
                         <td class="p-2 font-sans font-bold text-left text-gray-800 dark:text-gray-200 text-xs">${m.home} 🆚 ${m.away}</td>
-                        <td class="p-2 text-right text-blue-600 font-bold">${bHome.toLocaleString()}</td>
-                        <td class="p-2 text-right text-teal-600 font-bold">${bAway.toLocaleString()}</td>
-                        <td class="p-2 text-right text-red-600 font-bold">${gOver.toLocaleString()}</td>
-                        <td class="p-2 text-right text-amber-600 font-bold">${gUnder.toLocaleString()}</td>
-                        <td class="p-2 text-right bg-gray-50 dark:bg-gray-900 font-bold text-gray-900 dark:text-white">${tot.toLocaleString()}</td>
+                        <td class="p-2 text-center text-blue-600 font-bold">${bHome.toLocaleString()}</td>
+                        <td class="p-2 text-center text-teal-600 font-bold">${bAway.toLocaleString()}</td>
+                        <td class="p-2 text-center text-red-600 font-bold">${gOver.toLocaleString()}</td>
+                        <td class="p-2 text-center text-amber-600 font-bold">${gUnder.toLocaleString()}</td>
+                        <td class="p-2 text-center bg-gray-50 dark:bg-gray-900 font-bold text-gray-900 dark:text-white">${tot.toLocaleString()}</td>
                     </tr>
                 `;
             });
@@ -1143,8 +1143,8 @@
                     document.getElementById('comm-rate').innerText = `${activePlayer.winPer}/${activePlayer.losePer}`;
                 }
             } else {
-                commWinDeduct = totalWin * 0.015; commLossDeduct = totalLoss * 0.015;
-                document.getElementById('comm-rate').innerText = `Avg 1.5%`;
+                commWinDeduct = totalWin * 0.03; commLossDeduct = totalLoss * 0.02;
+                document.getElementById('comm-rate').innerText = `3/2`;
             }
 
             let netWinAfterComm = totalWin - commWinDeduct;
