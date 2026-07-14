@@ -749,7 +749,7 @@
                 tbody.innerHTML += `
                     <tr class="hover:bg-yellow-100 dark:hover:bg-yellow-950/40 transition-colors">
                         <td class="p-2 text-center font-mono text-gray-400 text-xs">${idx + 1}</td>
-                        <td class="p-2 font-bold text-gray-800 dark:text-gray-200 text-xs">${m.home} <span class="text-gray-400 text-2xs">VS</span> ${m.away}</td>
+                        <td class="p-2 font-bold text-gray-800 dark:text-gray-200 text-xs">${m.home} <span class="text-gray-400 text-2xs">🆚</span> ${m.away}</td>
                         <td class="p-2 font-mono font-bold text-emerald-600 text-xs">${m.bodyOdds}</td>
                         <td class="p-2 font-mono font-bold text-orange-600 text-xs">${m.goalOdds}</td>
                         <td class="p-2 font-mono text-center text-xs"><span class="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded font-bold">${m.homeScore}-${m.awayScore}</span></td>
@@ -808,7 +808,7 @@
         // SLIP ENTRY ENGINE
         function updateEntryDropdowns() {
             const mSel = document.getElementById('entry-match-select'); mSel.innerHTML = '';
-            matches.forEach(m => mSel.innerHTML += `<option value="${m.id}">${m.home} Vs ${m.away}</option>`);
+            matches.forEach(m => mSel.innerHTML += `<option value="${m.id}">${m.home} 🆚 ${m.away}</option>`);
 
             const pSel = document.getElementById('entry-player-select'); pSel.innerHTML = '';
             players.forEach(p => pSel.innerHTML += `<option value="${p.id}">${p.name}</option>`);
@@ -863,7 +863,7 @@
                     <tr class="hover:bg-yellow-100 dark:hover:bg-yellow-950/40 transition-colors">
                         <td class="p-2 text-center font-mono text-gray-400 text-xs">${idx + 1}</td>
                         <td class="p-2 font-bold text-xs">${p.name}</td>
-                        <td class="p-2 text-gray-600 dark:text-gray-400 text-xs">${m.home} Vs ${m.away}</td>
+                        <td class="p-2 text-gray-600 dark:text-gray-400 text-xs">${m.home} 🆚 ${m.away}</td>
                         <td class="p-2 font-semibold text-blue-500 text-xs">${e.type}</td>
                         <td class="p-2 font-mono font-bold text-xs">${e.odds}</td>
                         <td class="p-2 font-mono font-bold text-right text-xs">${e.amount.toLocaleString()}</td>
@@ -880,7 +880,7 @@
             document.getElementById('modal-entry-id').value = e.id;
 
             const mSel = document.getElementById('modal-entry-match-select'); mSel.innerHTML = '';
-            matches.forEach(m => mSel.innerHTML += `<option value="${m.id}">${m.home} Vs ${m.away}</option>`);
+            matches.forEach(m => mSel.innerHTML += `<option value="${m.id}">${m.home} 🆚 ${m.away}</option>`);
             mSel.value = e.matchId;
 
             const pSel = document.getElementById('modal-entry-player-select'); pSel.innerHTML = '';
@@ -1026,7 +1026,7 @@
                 let tot = bHome + bAway + gOver + gUnder;
                 tbody.innerHTML += `
                     <tr class="hover:bg-yellow-100 dark:hover:bg-yellow-950/40 transition-colors font-mono text-xs">
-                        <td class="p-2 font-sans font-bold text-left text-gray-800 dark:text-gray-200 text-xs">${m.home} Vs ${m.away}</td>
+                        <td class="p-2 font-sans font-bold text-left text-gray-800 dark:text-gray-200 text-xs">${m.home} 🆚 ${m.away}</td>
                         <td class="p-2 text-right text-blue-600 font-bold">${bHome.toLocaleString()}</td>
                         <td class="p-2 text-right text-teal-600 font-bold">${bAway.toLocaleString()}</td>
                         <td class="p-2 text-right text-red-600 font-bold">${gOver.toLocaleString()}</td>
