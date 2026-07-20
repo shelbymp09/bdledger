@@ -863,9 +863,9 @@
                     <tr class="hover:bg-yellow-100 dark:hover:bg-yellow-950/40 transition-colors">
                         <td class="p-2 text-center font-mono text-gray-400 text-xs">${idx + 1}</td>
                         <td class="p-2 font-bold text-xs">${p.name}</td>
-                        <td class="p-2 text-gray-600 dark:text-gray-400 text-xs">${m.home} 🆚 ${m.away}</td>
+                        <td class="p-2 text-red-500 dark:text-red-500 text-xs">${m.home} 🆚 ${m.away}</td>
                         <td class="p-2 font-semibold text-blue-500 text-xs">${e.type}</td>
-                        <td class="p-2 font-mono font-bold text-xs">${e.odds}</td>
+                        <td class="p-2 font-mono font-bold text-green-500 text-xs">${e.odds}</td>
                         <td class="p-2 font-mono font-bold text-right text-xs">${e.amount.toLocaleString()}</td>
                         <td class="p-2 text-center space-x-1">
                             <button onclick="openEditModal('${e.id}'); playTabSound();" class="bg-amber-500 text-white px-2 py-0.5 rounded text-2xs font-bold"><i class="fas fa-pen mr-1"></i>Edit/Delete</button>
